@@ -1,29 +1,32 @@
 import streamlit as st
-import random
 
-st.title("🪨📄✂️ Rock, Paper, Scissors Game!")
+st.title("🔐 Caesar Cipher")
+st.subheader("Encode or Decode Your Secret Messages 👀")
 
-rock = "🪨 Rock"
-paper = "📄 Paper"
-scissors = "✂️ Scissors"
+alphabet = [chr(i) for i in range(97, 123)]  # ['a' to 'z']
 
-choices = [rock, paper, scissors]
+def caesar(encode_or_decode, original_text, shift_amount):
+    output_text = ""
+    if encode_or_decode == "decode":
+        shift_amount *= -1
+    for letter in original_text:
+        if letter not in alphabet:
+            output_text += letter
+        else:
+            new_position = (alphabet.index(letter) + shift_amount) % 26
+            output_text += alphabet[new_position]
+    return output_text.title()
 
-player_choice = st.radio("Choose your move:", choices)
+# 🧭 User Inputs
+direction = st.radio("Select action:", ["Encode", "Decode"])
+text = st.text_input("Type your message:")
+shift = st.number_input("Shift number:", min_value=1, max_value=25, step=1)
 
-if st.button("Play!"):
-    st.write(f"You chose: **{player_choice}**")
-
-    computer_choice = random.choice(choices)
-    st.write(f"Computer chose: **{computer_choice}**")
-
-    if player_choice == computer_choice:
-        st.success("It's a draw!")
-    elif (
-            (player_choice == rock and computer_choice == scissors) or
-            (player_choice == paper and computer_choice == rock) or
-            (player_choice == scissors and computer_choice == paper)
-    ):
-        st.success("You win! 🎉")
+if st.button("Go!"):
+    if not text:
+        st.warning("Enter a message to proceed!")
     else:
-        st.error("Computer wins! 😢")
+        result = caesar(encode_or_decode=direction.lower(), original_text=text.lower(), shift_amount=int(shift))
+        st.success(f"Here's the {direction.lower()}d result:")
+        st.code(result, language='text')
+
